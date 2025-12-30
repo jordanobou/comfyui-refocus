@@ -4,9 +4,10 @@ Refocus - ComfyUI Nodes for Generative Refocusing
 Based on the Genfocus project (https://github.com/rayray9999/Genfocus)
 Provides deblurring and bokeh generation using FLUX LoRA adapters.
 
-Two implementations available:
-1. Legacy nodes (KSampler-based) - simpler but without proper LoRA conditioning
-2. Native Genfocus nodes (diffusers-based) - full multi-conditional support
+Main features:
+- Native Genfocus nodes (diffusers-based) - full multi-conditional support
+- DepthPro depth estimation nodes
+- Defocus map computation utilities
 
 License: Apache 2.0 (for Genfocus components)
 Note: Apple ml-depth-pro has its own license terms
@@ -59,7 +60,7 @@ if "diffusers" not in folder_paths.folder_names_and_paths:
 # IMPORT NODES
 # =============================================================================
 
-# Legacy nodes (KSampler-based, work without diffusers)
+# Depth Pro nodes (always available)
 from .nodes.depth_pro import (
     DepthProModelLoader, 
     DepthProEstimate,
@@ -68,11 +69,11 @@ from .nodes.depth_pro import (
     FocalPXtoMM,
     FocalMMtoPX,
 )
+# Utility nodes (KSampler-compatible helpers, limited functionality)
 from .nodes.genfocus_lora import GenfocusLoRALoader
 from .nodes.deblur import DeblurNetApply
 from .nodes.defocus_map import ComputeDefocusMap, SelectFocusPoint, FocusPointFromMask
 from .nodes.bokeh import BokehNetApply
-from .nodes.pipeline import GenfocusPipeline
 
 # Native Genfocus nodes (diffusers-based, full implementation)
 try:
@@ -114,9 +115,6 @@ NODE_CLASS_MAPPINGS = {
     
     # Bokeh Generation Stage (Legacy)
     "BokehNetApply": BokehNetApply,
-    
-    # Full Pipeline (Legacy - Convenience)
-    "GenfocusPipeline": GenfocusPipeline,
 }
 
 # Add native Genfocus nodes if available
@@ -148,22 +146,19 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "FocalPXtoMM": "Focal Length PX to MM",
     "FocalMMtoPX": "Focal Length MM to PX",
     
-    # LoRA Management (Legacy)
-    "GenfocusLoRALoader": "Load Genfocus LoRAs (Legacy)",
+    # LoRA Management (Utility)
+    "GenfocusLoRALoader": "Load Genfocus LoRAs (Utility)",
     
-    # Deblurring (Legacy)
-    "DeblurNetApply": "Apply DeblurNet (Legacy)",
+    # Deblurring (Utility)
+    "DeblurNetApply": "Apply DeblurNet (Utility)",
     
     # Defocus Map
     "ComputeDefocusMap": "Compute Defocus Map",
     "SelectFocusPoint": "Select Focus Point",
     "FocusPointFromMask": "Focus Point From Mask",
     
-    # Bokeh (Legacy)
-    "BokehNetApply": "Apply BokehNet (Legacy)",
-    
-    # Pipeline (Legacy)
-    "GenfocusPipeline": "Genfocus Pipeline (Legacy)",
+    # Bokeh (Utility)
+    "BokehNetApply": "Apply BokehNet (Utility)",
 }
 
 # Add native Genfocus display names if available

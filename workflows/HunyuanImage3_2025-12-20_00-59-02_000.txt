@@ -1,0 +1,5 @@
+Deblur Simple workflow Example Images
+1) The starting image was generated with my Hunyuan Image 3 nodes.  You can see that it slighlty blurs the background in a natural way. 
+2) The deblurred result has background and foreground elements in focus as well as sharpened the whole image. I use my Richardson-Lucy node to finish the sharpening but it's not necessary and I would not do that until the final steps (ie - after upscaling).
+
+There aren't many adjustmnet factors exposed to the user in this setup - so it can be easily automated.  It's flux.1-dev so the best results will be with image sizes around 1 MP but you can experiment since flux can go a bit higher without problems. Increasing the number of steps can make slight improvements in image quality.

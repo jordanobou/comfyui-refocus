@@ -9,7 +9,7 @@ Transform any photo into a professional-looking image with controllable depth-of
 - **DeblurNet**: Restore all-in-focus images from blurry/defocused inputs
 - **BokehNet**: Generate realistic depth-of-field effects with controllable focus
 - **DepthPro**: High-quality metric depth estimation (Apple ml-depth-pro)
-- **Two Implementations**: Legacy (KSampler-based) and Native (diffusers-based)
+- **Depth Utilities**: Convert between depth formats, focal length calculations
 
 ---
 
@@ -69,16 +69,7 @@ ComfyUI/
 
 ## Node Reference
 
-### Two Implementation Types
-
-| Type | Pros | Cons |
-|------|------|------|
-| **Native (diffusers)** | Full Genfocus pipeline, proper LoRA conditioning | Requires diffusers, separate FLUX download |
-| **Legacy (KSampler)** | Uses ComfyUI's native workflow | LoRAs don't condition properly |
-
----
-
-## Native Nodes (Recommended)
+## Genfocus Nodes (diffusers-based)
 
 These nodes use the full Genfocus implementation with proper multi-conditional LoRA support.
 
@@ -200,9 +191,9 @@ Creates a condition from a defocus map for bokeh generation.
 
 ---
 
-## Legacy Nodes (KSampler-based)
+## Depth & Utility Nodes
 
-These nodes work with ComfyUI's standard KSampler but don't have proper multi-conditional LoRA support.
+These standalone utility nodes work independently and can be used with any workflow.
 
 ### Load DepthPro Model
 Loads Apple's ml-depth-pro model for depth estimation.
@@ -349,14 +340,76 @@ Extract focus point from any mask source. Great for interactive workflows!
                                                 └─────────────────────┘
 ```
 
+---
+
 ## Example Workflows
 
-See the `workflows/` folder for ready-to-use ComfyUI workflow files:
+Ready-to-use workflow files are in the `workflows/` folder. Download the JSON files or drag the PNG workflow images directly into ComfyUI!
 
-- `workflow_deblur_simple.json` - Basic deblurring
-- `workflow_bokeh_full.json` - Complete bokeh pipeline with depth estimation
+---
 
-### Simple Deblur Workflow
+### 🔄 Refocus Workflow
+
+**Files:** 
+- `Refocus-Eric-1225.json` / `Refocus-Eric-1225.png` (workflow)
+- Input: `HunyuanImage3_2025-12-11_17-30-15_000.png`
+
+This workflow demonstrates the complete refocusing pipeline: deblur an image first, then selectively refocus to create professional depth-of-field effects.
+
+#### Workflow Diagram
+![Refocus Workflow](workflows/Refocus-Eric-1225.png)
+
+#### Input Image
+The starting image was generated with Hunyuan Image 3 (NF4). It has a soft, natural background blur — similar to what you'd get from a small format camera at f/8.
+
+![Input Image](workflows/HunyuanImage3_2025-12-11_17-30-15_000.png)
+
+#### Results
+
+| Result | Description |
+|--------|-------------|
+| ![Deblurred](workflows/HunyuanImage3_2025-12-11_17-30-15_000_deblur.png) | **Deblurred** — Extended depth of field from foreground to infinity. Notice how both the subject and background are now sharp. |
+| ![Refocus 1](workflows/Refocused_2025-12-30_03-12-45_000_refocus1.png) | **Refocus 1** — Focus on subject's face using a small mask mark. The background is blurred to make the subject stand out. Adjust `blur_strength` and `max_coc` for more dramatic separation. |
+| ![Refocus 2](workflows/Refocused_2025-12-30_03-12-45_000_refocus2.png) | **Refocus 2** — Creative example: focus shifted to the 2nd car in the background. The subject is now artistically blurred. |
+
+#### Key Concepts
+
+- **Deblur** sharpens everything — extends depth of field from foreground to infinity
+- **Refocus** shifts the focal plane to wherever you mark with a mask or set with [x,y] coordinates
+- `max_coc` and `blur_strength` in the Compute Defocus node control how much blur is applied outside the depth of field
+
+---
+
+### 🔍 Simple Deblur Workflow
+
+**Files:**
+- `Deblur_Eric_1225_simple.json` / `Deblur_Eric_1225_simple.png` (workflow)
+- Input: `HunyuanImage3_2025-12-20_00-59-02_000.png`
+
+A minimal workflow for deblurring images with very few adjustable parameters — perfect for automation or batch processing.
+
+#### Workflow Diagram
+![Deblur Simple Workflow](workflows/Deblur_Eric_1225_simple.png)
+
+#### Before & After
+
+| Input | Output |
+|-------|--------|
+| ![Input](workflows/HunyuanImage3_2025-12-20_00-59-02_000.png) | ![Deblurred](workflows/HunyuanImage3_2025-12-20_00-59-02_000_deblured.png) |
+| Original image with natural background blur | Deblurred result with sharp foreground and background |
+
+#### Notes
+
+- The input image (generated with Hunyuan Image 3) has a subtle, natural-looking background blur
+- The deblurred result brings both foreground and background elements into sharp focus
+- For additional sharpening, consider using a Richardson-Lucy deconvolution node as a final step (after upscaling)
+- **Minimal configuration required** — great for automation pipelines
+- Works best with images around 1 megapixel (FLUX.1-dev native resolution), though FLUX handles larger sizes reasonably well
+- Increasing the number of steps can provide slight quality improvements
+
+---
+
+### Simple Deblur Workflow Diagram
 ```
 ┌─────────────────┐     ┌─────────────────────┐     ┌─────────────────────┐
 │   Load Image    │────▶│ Genfocus Model      │────▶│ Genfocus Deblur     │
@@ -372,7 +425,7 @@ See the `workflows/` folder for ready-to-use ComfyUI workflow files:
                                                     └─────────────────────┘
 ```
 
-### Full Bokeh Pipeline
+### Full Bokeh Pipeline Diagram
 ```
 ┌─────────────────┐     ┌─────────────────────┐
 │   Load Image    │────▶│ Genfocus Model      │
@@ -570,6 +623,36 @@ The Genfocus bokeh network expects a **sharp input**. If you skip deblurring:
 | Genfocus LoRAs | Apache 2.0 | ✅ Yes |
 | Apple ml-depth-pro | Apple Sample Code | ⚠️ Research only |
 | FLUX.1-dev | Non-Commercial | ❌ Requires license |
+
+---
+
+## Technical Notes
+
+### Why Diffusers Instead of Native ComfyUI FLUX?
+
+We initially attempted to create a native ComfyUI sampler that would allow using **any FLUX fine-tune** loaded in ComfyUI with Genfocus LoRAs. This would have been ideal — no need for a separate diffusers FLUX download, and compatibility with all FLUX variants.
+
+**The challenge:** Genfocus LoRAs were trained on the **diffusers FLUX architecture**, which uses separate Q, K, V projection layers:
+```
+transformer.single_transformer_blocks.0.attn.to_q
+transformer.single_transformer_blocks.0.attn.to_k
+transformer.single_transformer_blocks.0.attn.to_v
+```
+
+ComfyUI's FLUX implementation uses **fused QKV layers** for efficiency:
+```
+single_blocks.0.linear1  ← Contains Q, K, V, and MLP fused together
+```
+
+Applying LoRA weights trained for separate Q/K/V to a fused layer requires:
+1. Splitting the LoRA weights to the correct offsets within the fused layer
+2. Ensuring the math works out correctly for the different projections
+
+We implemented key mapping and offset-based patching using ComfyUI's built-in mechanisms, but the results showed characteristic spotted corruption patterns, indicating the LoRA weights weren't being applied correctly to the fused architecture.
+
+**Current status:** The native ComfyUI sampler approach is **abandoned for now**. The diffusers-based nodes work correctly because they use the exact architecture the LoRAs were trained on.
+
+**Future possibility:** If someone trains Genfocus-style LoRAs directly on ComfyUI's FLUX architecture, or develops proper weight conversion utilities, native sampling could become viable.
 
 ---
 
